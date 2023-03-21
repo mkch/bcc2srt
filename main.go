@@ -47,27 +47,25 @@ func srtTime(sec float32) string {
 	return fmt.Sprintf("%02v:%02v:%02v,%v", h, m, s, millis)
 }
 
-func bcc2srt(r io.Reader, w io.Writer) error {
-	const srtTemplate = `
+var srtTmpl = template.Must(template.New("srt").
+	Funcs(template.FuncMap{
+		"time": srtTime,
+		"add":  func(a, b int) int { return a + b }}).
+	Parse(`
 {{- range $i, $e :=.Body -}}
 {{add $i 1}}
 {{time $e.From}} --> {{time $e.To}}
 {{$e.Content}}
 
-{{end}}`
+{{end}}`))
 
+func bcc2srt(r io.Reader, w io.Writer) error {
 	bcc, err := parseBcc(r)
 	if err != nil {
 		return err
 	}
 
-	t := template.Must(template.New("srt").
-		Funcs(template.FuncMap{
-			"time": srtTime,
-			"add":  func(a, b int) int { return a + b }}).
-		Parse(srtTemplate))
-
-	return t.Execute(w, &bcc)
+	return srtTmpl.Execute(w, &bcc)
 }
 
 func errorExit(code int, msg string) {
