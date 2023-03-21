@@ -1,7 +1,8 @@
 # bcc2srt
+
 Convert bcc file to srt file.
 
-```
+```text
 Usage of ./bcc2srt:
 
 bcc2srt [-out output] [input ...]
