@@ -95,3 +95,28 @@ func TestBcc2Srt(t *testing.T) {
 		t.Fatal(ret)
 	}
 }
+
+func Test_changeExt(t *testing.T) {
+	type args struct {
+		filename string
+		ext      string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"normal", args{"a.txt", "html"}, "a.html"},
+		{"no_ext", args{"a", "html"}, "a.html"},
+		{"no_filename", args{".txt", "html"}, ".html"},
+		{"empty", args{"", "html"}, ".html"},
+		{"empty_ext", args{"a.txt", ""}, "a."},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := changeExt(tt.args.filename, tt.args.ext); got != tt.want {
+				t.Errorf("changeExt() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

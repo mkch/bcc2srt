@@ -80,6 +80,16 @@ func exec0() {
 	}
 }
 
+// changeExt change the extension name of the last element of
+// path to ext. If there is no extension name in path, a new
+// extension name will be added.
+func changeExt(path, ext string) string {
+	if dot := strings.LastIndexByte(path, '.'); dot != -1 {
+		return path[:dot] + "." + ext
+	}
+	return path + "." + ext
+}
+
 func exec1() {
 	var inFile = flag.Arg(0)
 	r, err := os.Open(inFile)
@@ -89,7 +99,7 @@ func exec1() {
 	defer r.Close()
 	var outFile = out
 	if outFile == "" {
-		outFile = inFile + ".srt"
+		outFile = changeExt(inFile, "srt")
 	}
 	w, err := os.OpenFile(outFile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0777)
 	if err != nil {
@@ -121,8 +131,8 @@ func execN() {
 			defer r.Close()
 			var outFile = gg.If(
 				out == "",
-				inFile+".srt",
-				filepath.Join(out, filepath.Base(inFile)+".srt"))
+				changeExt(inFile, ".srt"),
+				filepath.Join(out, changeExt(filepath.Base(inFile), "srt")))
 			w, err := os.OpenFile(outFile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0777)
 			if err != nil {
 				errored = true
